@@ -1,5 +1,5 @@
 /*
- * Smart Helmet – ESP32 firmware
+ * Smart Helmet - ESP32 firmware
  *
  * Features
  *   - Alcohol (MQ-3) + helmet-buckle ignition interlock
@@ -17,11 +17,11 @@
 // ---------------------------------------------------------------------------
 // Pin definitions
 // ---------------------------------------------------------------------------
-static const int PIN_MQ3         = 34;   // MQ-3 alcohol sensor  – ADC input
-static const int PIN_BUCKLE      = 25;   // Helmet buckle switch – digital input (LOW = buckled)
-static const int PIN_RELAY       = 26;   // Ignition relay       – digital output (HIGH = allow ignition)
+static const int PIN_MQ3         = 34;   // MQ-3 alcohol sensor  - ADC input
+static const int PIN_BUCKLE      = 25;   // Helmet buckle switch - digital input (LOW = buckled)
+static const int PIN_RELAY       = 26;   // Ignition relay       - digital output (HIGH = allow ignition)
 
-// MQ-3 raw ADC threshold (0–4095 on ESP32 12-bit ADC).
+// MQ-3 raw ADC threshold (0-4095 on ESP32 12-bit ADC).
 // Values above this level indicate alcohol is detected.
 static const int ALCOHOL_THRESHOLD = 400;
 
@@ -47,11 +47,11 @@ void checkCrash();
 void setup() {
   Serial.begin(115200);
 
-  // Ignition relay – default OFF (safe state)
+  // Ignition relay - default OFF (safe state)
   pinMode(PIN_RELAY,  OUTPUT);
   digitalWrite(PIN_RELAY, LOW);
 
-  // Buckle switch – internal pull-up so the pin reads HIGH when unbuckled
+  // Buckle switch - internal pull-up so the pin reads HIGH when unbuckled
   // and LOW when the buckle closes the circuit to GND
   pinMode(PIN_BUCKLE, INPUT_PULLUP);
 
@@ -64,7 +64,7 @@ void setup() {
 
   // IMU
   if (!mpu.begin()) {
-    Serial.println("MPU-6050 not found – crash detection disabled");
+    Serial.println("MPU-6050 not found - crash detection disabled");
   } else {
     mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
     mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
@@ -89,11 +89,11 @@ void loop() {
 //
 // Reads the MQ-3 alcohol sensor and the helmet-buckle digital pin.
 // The relay that controls the vehicle ignition is switched:
-//   ON  – only when buckle is fastened AND no alcohol is detected
-//   OFF – if the buckle is open OR alcohol is detected above threshold
+//   ON  - only when buckle is fastened AND no alcohol is detected
+//   OFF - if the buckle is open OR alcohol is detected above threshold
 // ===========================================================================
 void checkIgnitionInterlock() {
-  // --- 1. Read MQ-3 alcohol sensor (12-bit ADC: 0–4095) ---
+  // --- 1. Read MQ-3 alcohol sensor (12-bit ADC: 0-4095) ---
   int alcoholLevel = analogRead(PIN_MQ3);
 
   // --- 2. Read buckle switch ---
@@ -104,17 +104,17 @@ void checkIgnitionInterlock() {
   bool alcoholDetected = (alcoholLevel > ALCOHOL_THRESHOLD);
 
   if (buckled && !alcoholDetected) {
-    // Safe to ride: helmet is on and rider is sober – enable ignition
+    // Safe to ride: helmet is on and rider is sober - enable ignition
     digitalWrite(PIN_RELAY, HIGH);
-    Serial.println("Interlock: PASS – ignition enabled");
+    Serial.println("Interlock: PASS - ignition enabled");
   } else {
     // Unsafe: disable ignition and report reason
     digitalWrite(PIN_RELAY, LOW);
     if (!buckled) {
-      Serial.println("Interlock: FAIL – helmet buckle not fastened");
+      Serial.println("Interlock: FAIL - helmet buckle not fastened");
     }
     if (alcoholDetected) {
-      Serial.print("Interlock: FAIL – alcohol detected (ADC=");
+      Serial.print("Interlock: FAIL - alcohol detected (ADC=");
       Serial.print(alcoholLevel);
       Serial.println(")");
     }
@@ -122,7 +122,7 @@ void checkIgnitionInterlock() {
 }
 
 // ===========================================================================
-// handleGPS  – feed NMEA sentences into TinyGPSPlus
+// handleGPS  - feed NMEA sentences into TinyGPSPlus
 // ===========================================================================
 void handleGPS() {
   while (gpsSerial.available()) {
@@ -131,7 +131,7 @@ void handleGPS() {
 }
 
 // ===========================================================================
-// checkSpeed  – alert if speed exceeds limit
+// checkSpeed  - alert if speed exceeds limit
 // ===========================================================================
 void checkSpeed() {
   if (gps.speed.isUpdated()) {
@@ -145,7 +145,7 @@ void checkSpeed() {
 }
 
 // ===========================================================================
-// checkCrash  – detect sudden deceleration via MPU-6050
+// checkCrash  - detect sudden deceleration via MPU-6050
 // ===========================================================================
 void checkCrash() {
   sensors_event_t accel, gyro, temp;
@@ -161,7 +161,7 @@ void checkCrash() {
 
   // Threshold: ~3 g (29.4 m/s²) indicates a crash-level impact
   if (magnitude > 29.4f) {
-    Serial.print("CRASH DETECTED – acceleration magnitude: ");
+    Serial.print("CRASH DETECTED - acceleration magnitude: ");
     Serial.print(magnitude);
     Serial.println(" m/s²");
     if (gps.location.isValid()) {
